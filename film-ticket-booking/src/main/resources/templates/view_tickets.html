@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>View Tickets — FilmTickets</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #fda085 100%);
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+
+        /* NAVBAR */
+        .navbar {
+            background: rgba(255,255,255,0.2); backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255,255,255,0.3);
+            padding: 0 2.5rem; display: flex; align-items: center; justify-content: space-between;
+            height: 66px; position: sticky; top: 0; z-index: 100;
+        }
+        .brand { font-size: 1.5rem; font-weight: 900; letter-spacing: 3px; color: #fff; text-decoration: none; }
+        .brand span { color: #ffe066; }
+        .nav-links { display: flex; gap: 8px; list-style: none; }
+        .nav-links a { padding: 8px 16px; border-radius: 25px; text-decoration: none; color: #fff; font-size: 0.88rem; font-weight: 600; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); transition: all 0.25s; }
+        .nav-links a:hover { background: rgba(255,255,255,0.35); transform: translateY(-1px); }
+        .nav-cta { background: #fff !important; color: #764ba2 !important; font-weight: 800 !important; }
+
+        /* WRAPPER */
+        .wrapper { max-width: 1100px; margin: 0 auto; padding: 3rem 1.5rem 5rem; }
+
+        /* PAGE HEADER */
+        .page-header { margin-bottom: 2rem; }
+        .badge { display: inline-block; background: rgba(255,255,255,0.25); border: 1px solid rgba(255,255,255,0.5); color: #fff; font-size: 0.72rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 5px 14px; border-radius: 25px; margin-bottom: 10px; }
+        .page-header h1 { font-size: 2.4rem; font-weight: 900; color: #fff; letter-spacing: 2px; text-shadow: 0 2px 14px rgba(0,0,0,0.15); }
+        .page-header h1 span { color: #ffe066; }
+        .page-header p { color: rgba(255,255,255,0.82); font-size: 0.95rem; margin-top: 6px; }
+
+        /* ALERTS */
+        .alert { display: flex; align-items: center; gap: 10px; padding: 13px 18px; border-radius: 12px; font-size: 0.9rem; margin-bottom: 1.25rem; font-weight: 600; }
+        .alert-success { background: rgba(255,255,255,0.9); color: #1a7a3a; border-left: 4px solid #28a745; }
+        .alert-danger  { background: rgba(255,255,255,0.9); color: #c0392b; border-left: 4px solid #f5576c; }
+
+        /* SEARCH */
+        .search-form { display: flex; gap: 10px; margin-bottom: 1.75rem; max-width: 500px; }
+        .search-input { flex: 1; background: rgba(255,255,255,0.92); border: 2px solid rgba(255,255,255,0.6); border-radius: 30px; color: #444; font-family: inherit; font-size: 0.92rem; padding: 10px 18px; outline: none; transition: all 0.2s; }
+        .search-input:focus { background: #fff; border-color: #764ba2; box-shadow: 0 0 0 3px rgba(118,75,162,0.15); }
+        .search-input::placeholder { color: #bbb; }
+
+        /* BUTTONS */
+        .btn { display: inline-flex; align-items: center; gap: 6px; padding: 10px 22px; border-radius: 30px; font-size: 0.85rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; text-decoration: none; border: none; cursor: pointer; transition: all 0.25s; font-family: inherit; white-space: nowrap; }
+        .btn-primary { background: #fff; color: #764ba2; box-shadow: 0 4px 14px rgba(0,0,0,0.15); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(0,0,0,0.2); }
+        .btn-secondary { background: rgba(255,255,255,0.25); color: #fff; border: 1px solid rgba(255,255,255,0.45); }
+        .btn-secondary:hover { background: rgba(255,255,255,0.4); transform: translateY(-1px); }
+        .btn-edit   { background: linear-gradient(135deg,#43e97b,#38f9d7); color: #fff; padding: 6px 14px; font-size: 0.78rem; box-shadow: 0 3px 10px rgba(67,233,123,0.3); }
+        .btn-edit:hover   { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(67,233,123,0.4); }
+        .btn-delete { background: linear-gradient(135deg,#f5576c,#f093fb); color: #fff; padding: 6px 14px; font-size: 0.78rem; box-shadow: 0 3px 10px rgba(245,87,108,0.3); }
+        .btn-delete:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(245,87,108,0.4); }
+
+        /* TABLE */
+        .table-wrap { background: rgba(255,255,255,0.95); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.7); border-radius: 24px; overflow: hidden; box-shadow: 0 20px 60px rgba(102,126,234,0.25); }
+        .table-top { display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 1.75rem; border-bottom: 2px solid #f0e6ff; background: linear-gradient(90deg,#f8f4ff,#fce8ff); }
+        .table-title { font-size: 0.78rem; font-weight: 800; letter-spacing: 2.5px; text-transform: uppercase; color: #764ba2; }
+        .count-badge { background: linear-gradient(135deg,#667eea,#764ba2); color: #fff; font-size: 0.75rem; font-weight: 700; padding: 4px 14px; border-radius: 20px; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        thead th { background: linear-gradient(90deg,#f0e6ff,#fce8ff); padding: 12px 18px; text-align: left; font-size: 0.72rem; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: #9b59b6; border-bottom: 2px solid #e8d5f5; }
+        tbody tr { border-bottom: 1px solid #f5edff; transition: background 0.15s; }
+        tbody tr:last-child { border-bottom: none; }
+        tbody tr:hover { background: linear-gradient(90deg,#fdf5ff,#fff5f8); }
+        td { padding: 14px 18px; vertical-align: middle; color: #333; }
+        .td-id { color: #b39ddb; font-weight: 800; font-size: 0.82rem; }
+        .td-movie { font-weight: 700; color: #4a4a8a; font-size: 0.95rem; }
+        .td-time { color: #9b59b6; font-size: 0.88rem; font-weight: 600; }
+        .seat-badge { display: inline-block; background: linear-gradient(135deg,#667eea,#764ba2); color: #fff; font-weight: 800; font-size: 0.8rem; padding: 4px 12px; border-radius: 8px; letter-spacing: 1px; }
+        .td-price { font-weight: 900; font-size: 1.05rem; background: linear-gradient(135deg,#f5576c,#f093fb); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .td-actions { white-space: nowrap; }
+        .actions { display: flex; gap: 8px; }
+
+        /* EMPTY */
+        .empty { text-align: center; padding: 4rem 2rem; }
+        .empty-icon { font-size: 3.5rem; margin-bottom: 1rem; }
+        .empty h3 { font-size: 1.2rem; font-weight: 800; color: #764ba2; margin-bottom: 8px; }
+        .empty p { font-size: 0.88rem; color: #9b7cb6; margin-bottom: 1.5rem; }
+
+        /* BOTTOM */
+        .bottom-actions { display: flex; gap: 12px; margin-top: 2rem; flex-wrap: wrap; }
+
+        /* FOOTER */
+        footer { text-align: center; padding: 2rem; color: rgba(255,255,255,0.7); font-size: 0.8rem; }
+        footer span { color: #ffe066; font-weight: 700; }
+
+        @media(max-width:768px){ table{ font-size:0.8rem; } td,thead th{ padding:10px 10px; } }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <a th:href="@{/}" class="brand">FILM<span>TICKETS</span></a>
+    <ul class="nav-links">
+        <li><a th:href="@{/}">Home</a></li>
+        <li><a th:href="@{/view-tickets}">Tickets</a></li>
+        <li><a th:href="@{/add-ticket}" class="nav-cta">+ Book Now</a></li>
+    </ul>
+</nav>
+
+<div class="wrapper">
+
+    <div class="page-header">
+        <div class="badge">All Reservations</div>
+        <h1>VIEW <span>TICKETS</span></h1>
+        <p>All booked film tickets are listed below. You can edit or delete any entry.</p>
+    </div>
+
+    <div class="alert alert-success" th:if="${successMessage}">✅ <span th:text="${successMessage}"></span></div>
+    <div class="alert alert-danger"  th:if="${errorMessage}">❌ <span th:text="${errorMessage}"></span></div>
+
+    <form th:action="@{/search-tickets}" method="get" class="search-form">
+        <input type="text" name="keyword" class="search-input"
+               th:value="${keyword}" placeholder="🔍  Search by movie name or show time…"/>
+        <button type="submit" class="btn btn-primary">Search</button>
+        <a th:href="@{/view-tickets}" class="btn btn-secondary"
+           th:if="${keyword != null and !keyword.isEmpty()}">✕ Clear</a>
+    </form>
+
+    <div class="table-wrap">
+        <div class="table-top">
+            <span class="table-title">Ticket Records</span>
+            <span class="count-badge" th:text="${totalTickets} + ' ticket(s)'">0 ticket(s)</span>
+        </div>
+
+        <div th:if="${tickets != null and !tickets.isEmpty()}">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#ID</th>
+                        <th>Movie Name</th>
+                        <th>Show Time</th>
+                        <th>Seat</th>
+                        <th>Price</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="ticket : ${tickets}">
+                        <td class="td-id" th:text="${ticket.ticketId}">1</td>
+                        <td class="td-movie" th:text="${ticket.movieName}">Movie</td>
+                        <td class="td-time"  th:text="${ticket.showTime}">Time</td>
+                        <td><span class="seat-badge" th:text="${ticket.seatNumber}">A1</span></td>
+                        <td class="td-price">₹<span th:text="${ticket.price}">0</span></td>
+                        <td class="td-actions">
+                            <div class="actions">
+                                <a th:href="@{/edit-ticket/{id}(id=${ticket.ticketId})}" class="btn btn-edit">Edit</a>
+                                <a th:href="@{/delete-ticket/{id}(id=${ticket.ticketId})}" class="btn btn-delete"
+                                   onclick="return confirm('Delete this ticket? This cannot be undone.');">Delete</a>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="empty" th:if="${tickets == null or tickets.isEmpty()}">
+            <div class="empty-icon">🎟️</div>
+            <h3>No Tickets Found</h3>
+            <p th:if="${keyword != null and !keyword.isEmpty()}">No tickets match "<strong th:text="${keyword}"></strong>".</p>
+            <p th:unless="${keyword != null and !keyword.isEmpty()}">No tickets booked yet. Add your first one!</p>
+            <a th:href="@{/add-ticket}" class="btn btn-primary" style="margin-top:1rem;">Book First Ticket</a>
+        </div>
+    </div>
+
+    <div class="bottom-actions">
+        <a th:href="@{/add-ticket}" class="btn btn-primary">+ Book New Ticket</a>
+        <a th:href="@{/}"           class="btn btn-secondary">← Back to Home</a>
+    </div>
+
+</div>
+
+<footer>&copy; 2025 <span>FilmTickets</span> &nbsp;|&nbsp; Spring Boot &amp; Thymeleaf</footer>
+</body>
+</html>

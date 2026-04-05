@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Book Ticket — FilmTickets</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #fda085 100%);
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+
+        /* NAVBAR */
+        .navbar {
+            background: rgba(255,255,255,0.2); backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255,255,255,0.3);
+            padding: 0 2.5rem; display: flex; align-items: center; justify-content: space-between;
+            height: 66px; position: sticky; top: 0; z-index: 100;
+        }
+        .brand { font-size: 1.5rem; font-weight: 900; letter-spacing: 3px; color: #fff; text-decoration: none; }
+        .brand span { color: #ffe066; }
+        .nav-links { display: flex; gap: 8px; list-style: none; }
+        .nav-links a { padding: 8px 16px; border-radius: 25px; text-decoration: none; color: #fff; font-size: 0.88rem; font-weight: 600; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); transition: all 0.25s; }
+        .nav-links a:hover { background: rgba(255,255,255,0.35); transform: translateY(-1px); }
+        .nav-cta { background: #fff !important; color: #764ba2 !important; font-weight: 800 !important; }
+
+        /* WRAPPER */
+        .wrapper { max-width: 640px; margin: 0 auto; padding: 3rem 1.5rem 5rem; }
+
+        /* PAGE HEADER */
+        .page-header { margin-bottom: 2rem; }
+        .badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.25); border: 1px solid rgba(255,255,255,0.5);
+            color: #fff; font-size: 0.72rem; font-weight: 700; letter-spacing: 2px;
+            text-transform: uppercase; padding: 5px 14px; border-radius: 25px; margin-bottom: 10px;
+        }
+        .page-header h1 { font-size: 2.4rem; font-weight: 900; color: #fff; letter-spacing: 2px; text-shadow: 0 2px 14px rgba(0,0,0,0.15); }
+        .page-header h1 span { color: #ffe066; }
+        .page-header p { color: rgba(255,255,255,0.82); font-size: 0.95rem; margin-top: 6px; }
+
+        /* FORM CARD */
+        .form-card {
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.7);
+            border-radius: 24px; padding: 2.5rem;
+            box-shadow: 0 20px 60px rgba(102,126,234,0.25);
+        }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+        .full { grid-column: 1 / -1; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-label { font-size: 0.75rem; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: #764ba2; }
+        .form-control {
+            background: #f8f4ff; border: 2px solid #e8d5f5;
+            border-radius: 10px; color: #333; font-family: inherit;
+            font-size: 0.95rem; padding: 11px 14px; width: 100%; outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .form-control:focus { border-color: #764ba2; box-shadow: 0 0 0 3px rgba(118,75,162,0.15); background: #fff; }
+        .form-control::placeholder { color: #c4a8d8; }
+        .form-control.error { border-color: #f5576c; box-shadow: 0 0 0 3px rgba(245,87,108,0.15); }
+        .field-error { font-size: 0.76rem; color: #f5576c; font-weight: 600; }
+        .form-hint { font-size: 0.76rem; color: #a07bc0; }
+
+        /* BUTTONS */
+        .form-actions { display: flex; gap: 12px; margin-top: 1.75rem; flex-wrap: wrap; }
+        .btn { display: inline-flex; align-items: center; gap: 7px; padding: 12px 26px; border-radius: 30px; font-size: 0.9rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; text-decoration: none; border: none; cursor: pointer; transition: all 0.25s; font-family: inherit; }
+        .btn-primary { background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; box-shadow: 0 6px 20px rgba(118,75,162,0.35); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(118,75,162,0.45); }
+        .btn-secondary { background: #f0e6ff; color: #764ba2; font-weight: 700; }
+        .btn-secondary:hover { background: #e4d0f8; transform: translateY(-1px); }
+
+        /* FOOTER */
+        footer { text-align: center; padding: 2rem; color: rgba(255,255,255,0.7); font-size: 0.8rem; }
+        footer span { color: #ffe066; font-weight: 700; }
+
+        @media(max-width:600px){ .form-grid{ grid-template-columns:1fr; } .form-card{ padding:1.75rem; } }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <a th:href="@{/}" class="brand">FILM<span>TICKETS</span></a>
+    <ul class="nav-links">
+        <li><a th:href="@{/}">Home</a></li>
+        <li><a th:href="@{/view-tickets}">Tickets</a></li>
+        <li><a th:href="@{/add-ticket}" class="nav-cta">+ Book Now</a></li>
+    </ul>
+</nav>
+
+<div class="wrapper">
+    <div class="page-header">
+        <div class="badge">New Reservation</div>
+        <h1>BOOK A <span>TICKET</span></h1>
+        <p>Fill in the details below to add a new film ticket to the system.</p>
+    </div>
+
+    <div class="form-card">
+        <form th:action="@{/add-ticket}" th:object="${ticket}" method="post" novalidate>
+            <div class="form-grid">
+
+                <div class="form-group full">
+                    <label class="form-label" for="movieName">Movie Name</label>
+                    <input type="text" id="movieName"
+                           th:field="*{movieName}"
+                           th:class="${#fields.hasErrors('movieName')} ? 'form-control error' : 'form-control'"
+                           placeholder="e.g. Interstellar"/>
+                    <div class="field-error" th:if="${#fields.hasErrors('movieName')}" th:errors="*{movieName}"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="showTime">Show Time</label>
+                    <input type="text" id="showTime"
+                           th:field="*{showTime}"
+                           th:class="${#fields.hasErrors('showTime')} ? 'form-control error' : 'form-control'"
+                           placeholder="e.g. 07:30 PM"/>
+                    <div class="field-error" th:if="${#fields.hasErrors('showTime')}" th:errors="*{showTime}"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="seatNumber">Seat Number</label>
+                    <input type="text" id="seatNumber"
+                           th:field="*{seatNumber}"
+                           th:class="${#fields.hasErrors('seatNumber')} ? 'form-control error' : 'form-control'"
+                           placeholder="e.g. A12"/>
+                    <div class="field-error" th:if="${#fields.hasErrors('seatNumber')}" th:errors="*{seatNumber}"></div>
+                </div>
+
+                <div class="form-group full">
+                    <label class="form-label" for="price">Ticket Price (₹)</label>
+                    <input type="number" id="price"
+                           th:field="*{price}"
+                           th:class="${#fields.hasErrors('price')} ? 'form-control error' : 'form-control'"
+                           placeholder="e.g. 250" step="0.01" min="1"/>
+                    <div class="field-error" th:if="${#fields.hasErrors('price')}" th:errors="*{price}"></div>
+                    <span class="form-hint">Enter price in Indian Rupees</span>
+                </div>
+
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Book Ticket</button>
+                <a th:href="@{/view-tickets}" class="btn btn-secondary">← Back to Tickets</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<footer>&copy; 2025 <span>FilmTickets</span> &nbsp;|&nbsp; Spring Boot &amp; Thymeleaf</footer>
+</body>
+</html>
